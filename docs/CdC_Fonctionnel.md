@@ -1,6 +1,6 @@
 # Cahier des Charges Fonctionnel - Lab42c
 
-## 1. Contexte
+# 1. Contexte
 
 Lab42c est une entreprise spécialisée dans le développement de solutions techniques destinées aux entreprises du secteur des médias. Les infrastructures des clients sont entièrement déployées sur Amazon Web Services (AWS), puis exploitées et maintenues par Lab42c.
 
