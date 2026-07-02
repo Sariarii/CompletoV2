@@ -23,15 +23,6 @@ export default function Sidebar({ open, onClose, user, role }: Props) {
             <span>📊</span> Dashboard
           </a>
           <a href='#' onClick={onClose}>
-            <span>🧾</span> Factures
-          </a>
-          <a href='#' onClick={onClose}>
-            <span>📈</span> Prévisions
-          </a>
-          <a href='#' onClick={onClose}>
-            <span>⚙️</span> Préférences
-          </a>
-          <a href='#' onClick={onClose}>
             <span>📚</span> Aide
           </a>
         </nav>
