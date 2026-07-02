@@ -157,7 +157,6 @@ Solution adaptée à :
 | Scalabilité               | Automatique                 | Manuelle ou semi-automatique        |
 | Temps de développement    | Moyen                       | Moyen                               |
 | Maintenance               | Faible                      | Moyenne                             |
-| Lisibilité métier         | Moyenne                     | Excellente                          |
 | Flexibilité des requêtes  | Limitée (NoSQL)             | Excellente (SQL)                    |
 | Débogage                  | Distribué complexe          | Plus simple                         |
 
