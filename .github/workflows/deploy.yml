@@ -1,0 +1,56 @@
+name: Déploiement GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois, on annule les précédents en attente
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Build (Vite)
+        env:
+          # URL publique de ton API de coûts (backend déployé ailleurs,
+          # GitHub Pages ne sert que du statique). À définir dans
+          # Settings > Secrets and variables > Actions > Variables.
+          VITE_COST_API_URL: ${{ vars.VITE_COST_API_URL }}
+        run: npm run build -- --base=/${{ github.event.repository.name }}/
+
+      - name: Préparer l'artifact Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Déployer sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
