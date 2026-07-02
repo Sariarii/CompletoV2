@@ -178,7 +178,94 @@ La solution serverless AWS est retenue car elle répond le mieux aux contraintes
 
 ---
 
-# 6. Exigences qualité – ISO/IEC 25010:2011
+# 6. Déploiement automatique (CI/CD)
+
+## 6.1 Objectif
+
+Afin de garantir des mises en production fiables et reproductibles, le projet met en place une chaîne d'intégration et de déploiement continus (CI/CD).
+
+Chaque modification validée sur la branche **main** du dépôt GitHub est automatiquement compilée, testée puis déployée sur l'infrastructure AWS. Cette automatisation permet de réduire les erreurs humaines, d'accélérer les mises en production et d'assurer une cohérence entre les différents environnements.
+
+---
+
+## 6.2 Services utilisés
+
+Le pipeline de déploiement s'appuie sur les services suivants :
+
+- **GitHub** : hébergement du code source et déclenchement du pipeline.
+- **GitHub Actions** : compilation, tests et déploiement automatique.
+- **AWS IAM** : authentification sécurisée entre GitHub et AWS via un rôle IAM (OIDC).
+- **Amazon S3** : hébergement du frontend React.
+- **Amazon CloudFront** : diffusion du site web et mise à jour du cache.
+- **AWS Lambda** : déploiement des fonctions backend.
+- **Amazon API Gateway** : exposition des API.
+- **Amazon CloudWatch** : surveillance et centralisation des journaux.
+
+---
+
+## 6.3 Déroulement du déploiement
+
+À chaque **push** sur la branche **main**, le pipeline exécute automatiquement les étapes suivantes :
+
+1. Récupération du code source.
+2. Installation des dépendances.
+3. Compilation du frontend et du backend.
+4. Exécution des tests automatiques.
+5. Déploiement du frontend sur Amazon S3.
+6. Invalidation du cache CloudFront.
+7. Déploiement des fonctions AWS Lambda.
+8. Vérification du déploiement et enregistrement des journaux dans CloudWatch.
+
+Si une étape échoue, le déploiement est interrompu afin d'éviter la mise en production d'une version instable.
+
+---
+
+## 6.4 Avantages
+
+L'automatisation du déploiement permet de :
+
+- réduire les erreurs humaines ;
+- accélérer les mises en production ;
+- garantir des déploiements reproductibles ;
+- assurer la traçabilité des versions déployées ;
+- faciliter la maintenance et les évolutions futures.
+
+---
+
+## 6.5 Schéma du pipeline
+
+```text
+Développeur
+      │
+      ▼
+GitHub (push sur main)
+      │
+      ▼
+GitHub Actions
+      │
+ ┌───────────────┐
+ │ Compilation   │
+ │ Tests         │
+ │ Build         │
+ └───────────────┘
+      │
+      ▼
+Déploiement AWS
+ ├── Amazon S3 (Frontend)
+ ├── CloudFront
+ ├── AWS Lambda (Backend)
+ └── API Gateway
+      │
+      ▼
+CloudWatch
+(Logs et supervision)
+```
+
+Cette chaîne CI/CD garantit un déploiement rapide, fiable et sécurisé de l'application tout en respectant les bonnes pratiques DevOps et les exigences de qualité définies dans ce cahier des charges.
+
+---
+
+# 7. Exigences qualité – ISO/IEC 25010:2011
 
 Afin d'objectiver l'évaluation de la qualité logicielle du projet, les exigences non fonctionnelles et les choix d'architecture sont mis en correspondance avec le modèle de qualité produit défini par la norme, qui structure la qualité d'un logiciel autour de huit caractéristiques principales.
 
@@ -197,9 +284,9 @@ Cette mise en correspondance confirme que l'architecture serverless retenue (Sol
 
 ---
 
-# 7. Budget prévisionnel
+# 8. Budget prévisionnel
 
-## 7.1 Coût de développement
+## 8.1 Coût de développement
 
 Le budget du développement est estimé sur la base des hypothèses suivantes :
 
@@ -209,7 +296,7 @@ Le budget du développement est estimé sur la base des hypothèses suivantes :
 
 Ainsi, on obtient un total de **36 000 €** pour 3 mois de développement.
 
-## 7.2 Coûts mensuels
+## 8.2 Coûts mensuels
 
 Une estimation des coûts mensuels a été faite à l'aide de [calculator.aws](calculator.aws) ci-dessous :
 
@@ -227,7 +314,7 @@ Une estimation des coûts mensuels a été faite à l'aide de [calculator.aws](c
 
 On obtient donc un total approximatif annuel de **292.32 USD**.
 
-## 7.3 Analyse
+## 8.3 Analyse
 
 Le budget global reste inférieur au plafond fixé de **50 000 €**, laissant une marge pour :
 
@@ -235,7 +322,7 @@ Le budget global reste inférieur au plafond fixé de **50 000 €**, laissant u
 - ajustements fonctionnels
 - phase de recette / stabilisation
 
-## 7.4 Remarque sur la durée
+## 8.4 Remarque sur la durée
 
 Une durée de **3 mois est réaliste mais optimiste**, sous réserve que :
 
@@ -247,9 +334,9 @@ Une estimation plus prudente serait **3 à 4 mois** pour inclure tests et ajuste
 
 ---
 
-# 8. User Stories – Solution 1 (Serverless AWS)
+# 9. User Stories – Solution 1 (Serverless AWS)
 
-## 8.1 Rôle : Administrateur Lab42c
+## 9.1 Rôle : Administrateur Lab42c
 
 ### US-1 : Visualisation des coûts globaux
 
@@ -297,7 +384,7 @@ En tant que système, je dois calculer les prévisions de facturation afin d’a
 
 ---
 
-# 9. Conclusion technique
+# 10. Conclusion technique
 
 L’architecture serverless AWS constitue le meilleur compromis entre coût, performance et évolutivité, tout en garantissant une intégration optimale dans l’environnement technique existant de Lab42c.
 

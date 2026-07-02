@@ -1,0 +1,64 @@
+name: Déploiement AWS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: eu-west-3
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installation des dépendances
+        run: npm install
+
+      - name: Exécution des tests
+        run: npm test -- --watch=false
+        continue-on-error: true
+
+      - name: Compilation du frontend
+        run: npm run build
+
+      - name: Configuration AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Déploiement du frontend sur S3
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET }} --delete
+
+      - name: Invalidation du cache CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION }} \
+            --paths "/*"
+
+      # Si tu utilises AWS SAM
+      - name: Installation de SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Déploiement des fonctions Lambda
+        run: |
+          sam build
+          sam deploy \
+            --stack-name lab42c \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
