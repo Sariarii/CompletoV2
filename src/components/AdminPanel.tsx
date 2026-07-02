@@ -188,26 +188,28 @@ export default function AdminPanel({ catalog }: Props) {
         <div className="card">
           <h3>Catalogue des services AWS</h3>
           <div className="sub">Prix avant / après facturation, sur la période sélectionnée</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Service</th>
-                <th className="num">Avant facture (brut)</th>
-                <th className="num">Après facture (+ marge)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {catalog.map((item) => (
-                <tr key={item.service}>
-                  <td>
-                    <span className="pill pill-aws">{item.service}</span>
-                  </td>
-                  <td className="num">{formatEUR(item.grossEUR)}</td>
-                  <td className="num">{formatEUR(item.totalEUR)}</td>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th className="num">Avant facture (brut)</th>
+                  <th className="num">Après facture (+ marge)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {catalog.map((item) => (
+                  <tr key={item.service}>
+                    <td>
+                      <span className="pill pill-aws">{item.service}</span>
+                    </td>
+                    <td className="num">{formatEUR(item.grossEUR)}</td>
+                    <td className="num">{formatEUR(item.totalEUR)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -217,46 +219,48 @@ export default function AdminPanel({ catalog }: Props) {
         {clients.length === 0 ? (
           <div className="empty-state">Aucun client pour l'instant. Ajoute-en un ci-dessus.</div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Client</th>
-                <th>Services</th>
-                <th className="num">Avant facture</th>
-                <th className="num">Après facture</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((c) => {
-                const totals = totalsFor(c.services);
-                return (
-                  <tr key={c.id}>
-                    <td>
-                      <b>{c.name}</b>
-                      {c.email && <div className="client-email">{c.email}</div>}
-                    </td>
-                    <td>
-                      <div className="client-services">
-                        {c.services.map((s) => (
-                          <span key={s} className="pill pill-aws">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="num">{formatEUR(totals.gross)}</td>
-                    <td className="num">{formatEUR(totals.total)}</td>
-                    <td>
-                      <button className="btn btn-danger" onClick={() => handleDelete(c.id)}>
-                        Supprimer
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Services</th>
+                  <th className="num">Avant facture</th>
+                  <th className="num">Après facture</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((c) => {
+                  const totals = totalsFor(c.services);
+                  return (
+                    <tr key={c.id}>
+                      <td>
+                        <b>{c.name}</b>
+                        {c.email && <div className="client-email">{c.email}</div>}
+                      </td>
+                      <td>
+                        <div className="client-services">
+                          {c.services.map((s) => (
+                            <span key={s} className="pill pill-aws">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="num">{formatEUR(totals.gross)}</td>
+                      <td className="num">{formatEUR(totals.total)}</td>
+                      <td>
+                        <button className="btn btn-danger" onClick={() => handleDelete(c.id)}>
+                          Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

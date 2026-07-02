@@ -1,80 +1,25 @@
 /**
- * Client de l'API simulée AWS Cost Explorer.
+ * Client de coûts AWS — 100% front.
  *
- * En dev, les appels passent par le proxy Vite (/api/cost-explorer -> http://localhost:3030).
- * En prod, il suffira de changer VITE_COST_API_URL vers la vraie API Gateway.
+ * Il n'y a plus de backend : les données sont générées localement par
+ * mockCostGenerator.ts (même logique déterministe que l'ancienne API
+ * simulée). L'interface (getCostAndUsage / getTags) reste identique afin
+ * que le reste de l'app n'ait rien à changer.
  */
 
-const API_BASE = import.meta.env.VITE_COST_API_URL || '/api/cost-explorer';
+import { generateCostAndUsage, generateTags } from './mockCostGenerator';
+import type { TimePeriod, GroupBy, GetCostAndUsageResponse } from './costs.types';
 
-// ============================================
-// Types côté API (miroir de openapi.yaml)
-// ============================================
-
-export interface TimePeriod {
-  Start: string; // yyyy-mm-dd
-  End: string;   // yyyy-mm-dd (exclusif)
-}
-
-export interface GroupBy {
-  Type: 'DIMENSION' | 'TAG';
-  Key: string; // 'SERVICE' pour DIMENSION, nom du tag pour TAG
-}
-
-export interface MetricValue {
-  Amount: string; // décimale en string (conforme AWS)
-  Unit: string;   // "USD"
-}
-
-export interface Group {
-  Keys: string[];
-  Metrics: {
-    UnblendedCost: MetricValue;
-  };
-}
-
-export interface ResultByTime {
-  TimePeriod: TimePeriod;
-  Total: {
-    UnblendedCost: MetricValue;
-  };
-  Groups: Group[];
-  Estimated: boolean;
-}
-
-export interface GetCostAndUsageResponse {
-  GroupDefinitions: GroupBy[];
-  ResultsByTime: ResultByTime[];
-  DimensionValueAttributes: unknown[];
-}
-
-// ============================================
-// Appels API
-// ============================================
-
-async function callApi<T>(target: string, body: unknown): Promise<T> {
-  const resp = await fetch(API_BASE + '/', {
-    method: 'POST',
-    headers: {
-      'X-Amz-Target': target,
-      'Content-Type': 'application/x-amz-json-1.1',
-    },
-    body: JSON.stringify(body ?? {}),
-  });
-  if (!resp.ok) {
-    const err = await resp.text();
-    throw new Error(`API ${resp.status} : ${err}`);
-  }
-  return resp.json() as Promise<T>;
-}
+export type { TimePeriod, GroupBy, MetricValue, Group, ResultByTime, GetCostAndUsageResponse } from './costs.types';
 
 export function getCostAndUsage(period: TimePeriod, groupBy?: GroupBy): Promise<GetCostAndUsageResponse> {
-  return callApi<GetCostAndUsageResponse>(
-    'AWSInsightsIndexService.GetCostAndUsage',
-    groupBy ? { TimePeriod: period, GroupBy: [groupBy] } : { TimePeriod: period }
-  );
+  try {
+    return Promise.resolve(generateCostAndUsage(period, groupBy));
+  } catch (err) {
+    return Promise.reject(err);
+  }
 }
 
 export function getTags(): Promise<{ Tags: string[]; ReturnSize: number }> {
-  return callApi('AWSInsightsIndexService.GetTags', {});
+  return Promise.resolve(generateTags());
 }

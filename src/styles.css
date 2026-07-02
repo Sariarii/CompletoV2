@@ -5,7 +5,8 @@ body { background: #F5F7FB; color: #1A2236; font-size: 14px; }
 
 /* ---- Sidebar ---- */
 .sidebar { background: #0D1B3D; color: #E8ECF7; padding: 24px 0; }
-.logo { font-weight: 800; font-size: 20px; padding: 0 24px 28px; letter-spacing: 1px; border-bottom: 1px solid #1F2D55; }
+.sidebar-top { display: flex; align-items: center; justify-content: space-between; padding: 0 24px 28px; border-bottom: 1px solid #1F2D55; }
+.logo { font-weight: 800; font-size: 20px; letter-spacing: 1px; }
 .logo span { color: #FF7849; }
 .nav { padding: 24px 0; }
 .nav a { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #A4ADC9; text-decoration: none; font-size: 14px; }
@@ -13,14 +14,21 @@ body { background: #F5F7FB; color: #1A2236; font-size: 14px; }
 .user-card { margin: 24px 16px; padding: 14px; background: #1B2A55; border-radius: 8px; }
 .user-card .name { font-weight: 600; color: #fff; }
 .user-card .role { color: #A4ADC9; font-size: 12px; margin-top: 4px; }
+.sidebar-close { display: none; background: none; border: none; color: #A4ADC9; font-size: 18px; cursor: pointer; padding: 4px; line-height: 1; }
+.sidebar-backdrop { display: none; }
 
 /* ---- Main ---- */
-.main { padding: 24px 32px; overflow-y: auto; }
+.main { padding: 24px 32px; overflow-y: auto; min-width: 0; }
 .topbar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+.topbar-title { display: flex; align-items: flex-start; gap: 12px; }
 .topbar h1 { font-size: 24px; font-weight: 700; color: #0D1B3D; }
 .topbar .crumb { color: #6B7693; font-size: 13px; margin-top: 4px; }
 .topbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-.topbar .actions { display: flex; gap: 12px; }
+.topbar .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.menu-toggle {
+  display: none; background: #fff; border: 1px solid #D5DAE8; border-radius: 8px;
+  width: 38px; height: 38px; font-size: 16px; cursor: pointer; color: #0D1B3D; flex-shrink: 0;
+}
 
 .btn {
   padding: 9px 16px; border-radius: 8px; border: 1px solid #D5DAE8;
@@ -105,7 +113,8 @@ body { background: #F5F7FB; color: #1A2236; font-size: 14px; }
 .card .sub { color: #6B7693; font-size: 12px; margin-bottom: 16px; }
 
 /* ---- Table ---- */
-table { width: 100%; border-collapse: collapse; }
+.table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; min-width: 560px; border-collapse: collapse; }
 thead th {
   text-align: left; padding: 10px 12px; font-size: 11px;
   text-transform: uppercase; letter-spacing: .5px; color: #6B7693;
@@ -171,8 +180,49 @@ tbody tr:hover { background: #F8FAFF; }
 .client-email { color: #6B7693; font-size: 12px; margin-top: 2px; }
 .client-services { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* ==== Responsive ==== */
+
+/* Tablette : sidebar en tiroir, grilles à 2 colonnes */
 @media (max-width: 1100px) {
+  .app { grid-template-columns: 1fr; }
+  .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .sidebar-close { display: block; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; height: 100vh; width: 260px; z-index: 1000;
+    transform: translateX(-100%); transition: transform 0.25s ease;
+    box-shadow: 4px 0 24px rgba(13,27,61,0.25); overflow-y: auto;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop {
+    display: block; position: fixed; inset: 0; background: rgba(13,27,61,0.45);
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 999;
+  }
+  .sidebar-backdrop.visible { opacity: 1; pointer-events: auto; }
+
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .charts-row { grid-template-columns: 1fr; }
   .admin-grid { grid-template-columns: 1fr; }
+}
+
+/* Mobile : tout s'empile, espacements réduits */
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+  .topbar h1 { font-size: 19px; }
+  .topbar-right { align-items: stretch; width: 100%; }
+  .view-toggle { justify-content: center; }
+  .actions { width: 100%; }
+  .actions .btn { flex: 1; justify-content: center; }
+
+  .filters { flex-direction: column; align-items: stretch; gap: 12px; }
+  .filter-group select, .filter-group input { min-width: 0; width: 100%; }
+  .presets { width: 100%; }
+  .preset-row { flex-wrap: wrap; }
+  .preset-btn { flex: 1 1 calc(50% - 6px); text-align: center; }
+
+  .kpis { grid-template-columns: 1fr; }
+  .kpi .value { font-size: 22px; }
+
+  .card { padding: 16px; }
+  .charts-row { gap: 12px; }
 }

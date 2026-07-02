@@ -32,11 +32,6 @@ jobs:
         run: npm ci
 
       - name: Build (Vite)
-        env:
-          # URL publique de ton API de coûts (backend déployé ailleurs,
-          # GitHub Pages ne sert que du statique). À définir dans
-          # Settings > Secrets and variables > Actions > Variables.
-          VITE_COST_API_URL: ${{ vars.VITE_COST_API_URL }}
         run: npm run build -- --base=/${{ github.event.repository.name }}/
 
       - name: Préparer l'artifact Pages

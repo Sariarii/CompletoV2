@@ -1,21 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
+// Le "base" (chemin /nom-du-repo/) est injecté automatiquement par le
+// workflow GitHub Actions via le flag --base, pas besoin de le fixer ici.
+// Plus de backend ni de proxy /api : toutes les données sont générées
+// côté client par src/api/mockCostGenerator.ts.
 export default defineConfig({
   plugins: [react()],
-  server: {
-    port: 5173,
-    open: true, // ouvre automatiquement le navigateur
-    proxy: {
-      // Proxy /api/costs vers l'API simulée sur port 3030
-      // Cela évite les problèmes CORS et permet de simuler
-      // la vraie API Gateway en production
-      '/api/cost-explorer': {
-        target: 'http://localhost:3030',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/cost-explorer/, ''),
-      },
-    },
-  },
 });

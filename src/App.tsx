@@ -28,6 +28,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<ViewMode>('client');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,18 +104,27 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="main">
         <div className="topbar">
-          <div>
-            <div className="crumb">
-              Tableau de bord / {view === 'client' ? 'Coûts AWS' : 'Administration'}
+          <div className="topbar-title">
+            <button
+              className="menu-toggle"
+              aria-label="Ouvrir le menu"
+              onClick={() => setSidebarOpen(true)}
+            >
+              ☰
+            </button>
+            <div>
+              <div className="crumb">
+                Tableau de bord / {view === 'client' ? 'Coûts AWS' : 'Administration'}
+              </div>
+              <h1>
+                {view === 'client'
+                  ? `Coûts d'infrastructure — ${selectedPreset.label}`
+                  : 'Gestion des clients'}
+              </h1>
             </div>
-            <h1>
-              {view === 'client'
-                ? `Coûts d'infrastructure — ${selectedPreset.label}`
-                : 'Gestion des clients'}
-            </h1>
           </div>
           <div className="topbar-right">
             <div className="view-toggle" role="tablist" aria-label="Changer de vue">
@@ -173,25 +183,25 @@ export default function App() {
 
         {error && (
           <div className="error-card">
-            <b>⚠ Erreur de connexion à l'API</b>
+            <b>⚠ Erreur de génération des données</b>
             <br />
             {error}
-            <br />
-            <small>
-              Vérifie que l'API simulée est bien lancée : <code>cd backend-api-simulee &amp;&amp; node server.js</code>
-            </small>
           </div>
         )}
 
         {loading && !error && <div className="loading">Chargement des coûts…</div>}
 
-        {!loading && !error && view === 'client' && (
+        {!loading && !error && (
           <>
             <div className="kpis">
-              <KpiCard label="Coût brut AWS" value={kpis.grossEUR} trend="up" trendLabel="▲ vs période précédente" />
-              <KpiCard label={`Marge 42c (${MARGIN_PERCENT} %)`} value={kpis.marginEUR} trend="neutral" trendLabel="Standard" />
-              <KpiCard label="Total refacturé HT" value={kpis.totalRefactureEUR} trend="up" trendLabel="▲ 8,4 %" primary />
               <KpiCard label="Prévision fin de mois" value={kpis.forecastEUR} trend="down" trendLabel="Projection linéaire" />
+              {view === 'admin' && (
+                <>
+                  <KpiCard label="Coût brut AWS" value={kpis.grossEUR} trend="up" trendLabel="▲ vs période précédente" />
+                  <KpiCard label={`Marge 42c (${MARGIN_PERCENT} %)`} value={kpis.marginEUR} trend="neutral" trendLabel="Standard" />
+                  <KpiCard label="Total refacturé HT" value={kpis.totalRefactureEUR} trend="up" trendLabel="▲ 8,4 %" primary />
+                </>
+              )}
             </div>
 
             <div className="charts-row">
